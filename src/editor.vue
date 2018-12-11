@@ -81,8 +81,12 @@
 
           // Instance
           this.quill = new Quill(this.$refs.editor, this._options)
-          
+
           this.quill.enable(false)
+
+          this.$refs.editor.addEventListener('click', event => {
+            this.$emit('click', { quill: this.quill, event });
+          });
 
           // Set editor content
           if (this.value || this.content) {
@@ -95,12 +99,13 @@
           }
 
           // Mark model as touched if editor lost focus
-          this.quill.on('selection-change', range => {
+          this.quill.on('selection-change', (range, oldRange, source) => {
             if (!range) {
               this.$emit('blur', this.quill)
             } else {
               this.$emit('focus', this.quill)
             }
+            this.$emit('selectionChange', { quill: this.quill, range, oldRange, source })
           })
 
           // Update model if text changes
